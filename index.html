@@ -1,0 +1,176 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaintheScent - Handcrafted Candles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9e9d8;
+      color: #333;
+    }
+    header {
+      background-color: #8b5a2b;
+      color: white;
+      text-align: center;
+      padding: 1.5em;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.2em;
+    }
+    header p {
+      margin: 0.5em 0;
+    }
+    header a {
+      color: #f9e9d8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .product img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .product h3 {
+      font-size: 1.2em;
+      margin: 10px 0;
+    }
+    .product p {
+      color: #555;
+      margin: 5px 0;
+    }
+    .paypal-button {
+      margin-top: 10px;
+    }
+    footer {
+      background-color: #8b5a2b;
+      color: white;
+      text-align: center;
+      padding: 1em;
+      position: relative;
+      width: 100%;
+    }
+    footer a {
+      color: #f9e9d8;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8em;
+      }
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SaintheScent</h1>
+    <p>Handcrafted Candles for a Cozy Home</p>
+    <p>Follow us on <a href="https://www.instagram.com/sainthescent/" target="_blank">Instagram</a></p>
+  </header>
+  <div class="container">
+    <h2>Our Candles</h2>
+    <div class="product-grid">
+      <!-- Product 1 -->
+      <div class="product">
+        <img src="https://via.placeholder.com/150?text=Lavender+Candle" alt="Lavender Bliss Candle">
+        <h3>Lavender Bliss</h3>
+        <p>$15.00 - 8oz, 40hr burn</p>
+        <div class="paypal-button">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="YOUR_PAYPAL_BUTTON_ID_1">
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
+          </form>
+        </div>
+      </div>
+      <!-- Product 2 -->
+      <div class="product">
+        <img src="https://via.placeholder.com/150?text=Vanilla+Candle" alt="Vanilla Glow Candle">
+        <h3>Vanilla Glow</h3>
+        <p>$15.00 - 8oz, 40hr burn</p>
+        <div class="paypal-button">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="YOUR_PAYPAL_BUTTON_ID_2">
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
+          </form>
+        </div>
+      </div>
+      <!-- Add more products here -->
+    </div>
+  </div>
+  <footer>
+    <p>© 2025 SaintheScent. All rights reserved.</p>
+    <p>Follow us on <a href="https://www.instagram.com/sainthescent/" target="_blank">Instagram</a></p>
+  </footer>
+</body>
+</html>
